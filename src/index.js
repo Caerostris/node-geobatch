@@ -72,17 +72,26 @@ export default class GeoBatch {
   }
 
   /**
+   * Retrieve a transform stream which will geocode all items written to it
+   * @param  {Object} stats  An object with the stream stats, defaults to {}.
+   * @return {Stream}        A transformable stream.
+   */
+  getStream(stats = {current: 0}) {
+    return new this.GeocodeStream(
+      this.geocoder,
+      stats,
+      this.accessor
+    );
+  }
+
+  /**
    * Geocode the elements of a passed in stream.
    * @param  {Stream} inputStream An input stream
    * @param  {Object} stats  An object with the stream stats, defaults to {}.
    * @return {Stream}        A transformable stream.
    */
   geocodeStream(inputStream, stats = {current: 0}) {
-    const geocodeStream = new this.GeocodeStream(
-      this.geocoder,
-      stats,
-      this.accessor
-    );
+    const geocodeStream = this.getStream(stats);
     inputStream.pipe(geocodeStream);
 
     return geocodeStream;

@@ -124,6 +124,24 @@ describe('Testing GeoBatch', () => {
     sinon.assert.calledWith(geocodeStreamFunction, mockInputStream);
   });
 
+  it('should provide a geocoding stream', () => {
+    const geoBatch = new GeoBatch(getGeocoderOptions()),
+      geocodeStream = geoBatch.getStream(),
+      dataHandler = sinon.stub();
+
+    // Check for instance of stream
+    should(geocodeStream).be.instanceof(stream);
+
+    geocodeStream.on('data', dataHandler);
+    geocodeStream.on('end', () => {
+      should(dataHandler.calledTwice).equal(true);
+    });
+
+    geocodeStream.write('Hamburg');
+    geocodeStream.write('Munich');
+    geocodeStream.end();
+  });
+
   it('geocodeStream should pipe geocoder stream', done => {
     // Create a mock geocode-stream class that passes elements unchanged.
     class mockGeocodeStream extends stream.Transform {
